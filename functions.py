@@ -1,17 +1,18 @@
 import os
 import yaml
 import re
-from zipfile import *
+from zipfile import ZipFile
 import shutil
 from bs4 import BeautifulSoup
 import requests
-import random
+import time
+
 
 def create_config():
     config_info = [
         {
             'first_start': False,
-            'steam_path': "C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game",
+            'steam_path': r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game",
             'width': 1280,
             'height': 720
         }
@@ -21,9 +22,9 @@ def create_config():
         yaml_config.close()
 
 
-def first_step(steam_path, heroes):              #Первый запуск, создание нужных директорий
-    if not os.path.exists(steam_path+'\D2MO'):
-        os.mkdir(steam_path+"\D2MO", mode=511, dir_fd=None)
+def first_step(steam_path):              # Первый запуск, создание нужных директорий
+    if not os.path.exists(steam_path+r'\D2MO'):
+        os.mkdir(steam_path+r"\D2MO", mode=511, dir_fd=None)
         print("directories were created")
     if not os.path.exists('config.yaml'):
         create_config()
@@ -49,18 +50,23 @@ def first_step(steam_path, heroes):              #Первый запуск, с�
                     if not os.path.exists('mods/' + i + '/' + n):
                         os.mkdir('mods/' + i + '/' + n)
 
+
 def find_all(script):
     with open(script, encoding='utf-8', mode='r') as d2mo_script_file:
         text = d2mo_script_file.read()
         text_re = re.findall(r'({\W*"n..."[\s\S]+)\n.*"to"|({\W*"n..."[\s\S]+)\n.+\Z', text)
         return text_re
 
+
 def vpk_create(items_game, files, path, steam_path):
     if os.path.exists('pak01_dir'):
         os.system(r'rmdir /Q /S pak01_dir')
     else:
         print('no such directory')
-    os.system(rf'decompiler\decompiler.exe -i "{steam_path}\game\dota\pak01_dir.vpk" -f "scripts\items\items_game.txt" --output "pak01_dir"')
+    script = r"scripts\items\items_game.txt"
+    command = rf'decompiler\decompiler.exe -i "{steam_path}\dota\pak01_dir.vpk" -f {script} --output "pak01_dir"'
+    os.system(command)
+    time.sleep(1)
     with open(items_game, encoding="utf-8", mode='r+') as items_game_file:
         items_game_text = items_game_file.read()
         for i in files:
@@ -87,19 +93,22 @@ def vpk_create(items_game, files, path, steam_path):
         print('all done', os.path.exists('pak01_dir'))
         os.system(r"echo %cd% ")
         os.system(r'vpk\vpk.exe pak01_dir pak01_dir')
-        if os.path.exists(f'{steam_path}\game\D2MO\pak01_dir.vpk'):
-            os.remove(f'{steam_path}\game\D2MO\pak01_dir.vpk')
-        shutil.move('pak01_dir.vpk', f'{steam_path}\game\D2MO')
+        if os.path.exists(rf'{steam_path}\D2MO\pak01_dir.vpk'):
+            os.remove(rf'{steam_path}\D2MO\pak01_dir.vpk')
+        shutil.move('pak01_dir.vpk', rf'{steam_path}\D2MO')
 
-def ConfigParser():
+
+def configparser():
     with open('config.yaml', 'r', encoding='utf-8') as yaml_config:
         data = yaml.load(yaml_config, yaml.FullLoader)
     with open('heroes.yaml', 'r', encoding='utf-8') as hero_config:
         heroes = yaml.load(hero_config, yaml.FullLoader)
 
     return data, heroes
-def Dota2HeroesParser():
-    headers={
+
+
+def dota2heroesparser():
+    headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
     }
@@ -109,22 +118,20 @@ def Dota2HeroesParser():
     quotes = soup.find_all('div', {'class': 'name'})
     with open('heroes.yaml', 'r', encoding='utf-8') as heroes_yaml:
         heroes = yaml.load(heroes_yaml, yaml.FullLoader)
+        # noinspection PyBroadException
         try:
             for i in quotes:
                 if i.text not in heroes[0]['heroes']:
                     heroes[0]['heroes'][i.text] = ['0']
                     heroes_yaml.close()
                     print(heroes)
-                with open('heroes.yaml', 'w', encoding='utf-8') as heroes_yaml:
-                    yaml.dump(heroes, heroes_yaml, allow_unicode=True)
+                with open('heroes.yaml', 'w', encoding='utf-8') as heroes_yaml_config:
+                    yaml.dump(heroes, heroes_yaml_config, allow_unicode=True)
                     heroes_yaml.close()
-        except:
+        except Exception:
             heroes = {'heroes': {}}
             for i in quotes:
                 heroes['heroes'][i.text] = ['0']
-            with open('heroes.yaml', 'w', encoding='utf-8') as heroes_yaml:
-                yaml.dump(heroes, heroes_yaml, allow_unicode=True)
+            with open('heroes.yaml', 'w', encoding='utf-8') as heroes_yaml_config:
+                yaml.dump(heroes, heroes_yaml_config, allow_unicode=True)
                 heroes_yaml.close()
-
-
-
