@@ -1,4 +1,4 @@
-- first_start: true
+- first_start: false
   height: 720
   steam_path: C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game
   view_resizable: true
