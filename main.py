@@ -21,11 +21,11 @@ class Interface(object):
         self.interface()
         self.current_hero = None
         self.current_slot = None
-        if data[0]['first_start'] is True or os.path.exists('config.yaml') is False:
+        if data[0]['first_start'] is True or path.exists('config.yaml') is False:
             print('first_start')
             first_step(steam_path=self.steam_path)
 
-    def heroes_search(self, sender, app_data):
+    def heroes_search(self, _, app_data):
         heroes_new = []
         if app_data is not None or not '':
             for i in self.heroes:
@@ -35,7 +35,7 @@ class Interface(object):
         else:
             dpg.configure_item("Heroes_list", items=self.heroes)
 
-    def items_search(self, sender, app_data):
+    def items_search(self, _, app_data):
         items_new = []
         if app_data is not None or not '':
             for i in self.items:
@@ -66,7 +66,7 @@ class Interface(object):
             self.current_hero = app_data
         elif sender == 'Slots_list':
             self.current_slot = app_data
-            self.items = os.listdir('mods/' + self.current_hero + '/' + self.current_slot)
+            self.items = listdir('mods/' + self.current_hero + '/' + self.current_slot)
             dpg.configure_item('Item_list', items=self.items)
         elif sender == 'Item_list':
             if len(self.current_items) == 0:
@@ -89,7 +89,7 @@ class Interface(object):
     def vpk_create(self):
 
         vpk_create(items_game=r'pak01_dir\scripts\items\items_game.txt', files=self.current_items,
-                   path='pak01_dir', steam_path=self.steam_path)
+                   pak_path='pak01_dir', steam_path=self.steam_path)
 
     def interface(self):
         dpg.create_context()
