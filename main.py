@@ -2,7 +2,66 @@ from functions import *
 import dearpygui.dearpygui as dpg
 
 
-class Interface(object):
+class Interface_styles(object):
+    @staticmethod
+    def styles():
+        big_let_start = 0x00C0  # Capital "A" in cyrillic alphabet
+        big_let_end = 0x00DF  # Capital "Я" in cyrillic alphabet
+        remap_big_let = 0x0410  # Starting number for remapped cyrillic alphabet
+        alph_len = big_let_end - big_let_start + 1  # adds the shift from big letters to small
+        with dpg.font_registry():
+            default_font = 'fonts/Roboto-Light.ttf'
+            with dpg.font(default_font, 20) as default_font:
+                dpg.add_font_range_hint(hint=dpg.mvFontRangeHint_Cyrillic)
+                biglet = remap_big_let
+                for i1 in range(big_let_start, big_let_end + 1):  # Cycle through big letters in cyrillic alphabet
+                    dpg.add_char_remap(i1, biglet)  # Remap the big cyrillic letter
+                    dpg.add_char_remap(i1 + alph_len, biglet + alph_len)  # Remap the small cyrillic letter
+                    biglet += 1  # choose next letter
+            bold_font = 'fonts/Roboto-Bold.ttf'
+            with dpg.font(bold_font, 18) as bold_font:
+                dpg.add_font_range_hint(hint=dpg.mvFontRangeHint_Cyrillic)
+                biglet = remap_big_let
+                for i1 in range(big_let_start, big_let_end + 1):  # Cycle through big letters in cyrillic alphabet
+                    dpg.add_char_remap(i1, biglet)  # Remap the big cyrillic letter
+                    dpg.add_char_remap(i1 + alph_len, biglet + alph_len)  # Remap the small cyrillic letter
+                    biglet += 1  # choose next letter
+        with dpg.theme() as global_theme:
+            cat = dpg.mvThemeCat_Core
+            with dpg.theme_component(dpg.mvAll):
+                # Roundings
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 12, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, 12, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_ScrollbarRounding, 0, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 6, category=cat)
+                # Main
+                dpg.add_theme_style(dpg.mvStyleVar_WindowPadding, 10, 10, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 8, 4, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 13, 4, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_GrabMinSize, 9, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 13, category=cat)
+                # Borders
+                dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_WindowBorderSize, 1, category=cat)
+                # Alignment
+                dpg.add_theme_style(dpg.mvStyleVar_WindowTitleAlign, 0.5, 0.5, category=cat)
+                dpg.add_theme_style(dpg.mvStyleVar_SelectableTextAlign, 0.0, 0.5, category=cat)
+                # Colors
+                dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (13, 19, 33), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (29, 45, 68), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (240, 235, 216), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_FrameBg, (62, 92, 118), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (13, 19, 33), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (116, 140, 171, 255), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (29, 45, 68, 255), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBgCollapsed, (0, 0, 0, 125), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (0, 0, 0), category=cat)
+                dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (10, 67, 47, 103), category=cat)
+
+        return default_font, bold_font, global_theme
+
+
+class Interface(Interface_styles):
 
     def __init__(self):
         super().__init__()
@@ -93,45 +152,7 @@ class Interface(object):
 
     def interface(self):
         dpg.create_context()
-        with dpg.font_registry():
-            default_font = 'fonts/Roboto-Light.ttf'
-            with dpg.font(default_font, 20) as default_font:
-                dpg.add_font_range_hint(hint=dpg.mvFontRangeHint_Cyrillic)
-            bold_font = 'fonts/Roboto-Bold.ttf'
-            with dpg.font(bold_font, 18) as bold_font:
-                dpg.add_font_range_hint(hint=dpg.mvFontRangeHint_Cyrillic)
-        # styles
-        with dpg.theme() as global_theme:
-            cat = dpg.mvThemeCat_Core
-            with dpg.theme_component(dpg.mvAll):
-                # Roundings
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 12, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, 12, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_ScrollbarRounding, 0, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 6, category=cat)
-                # Main
-                dpg.add_theme_style(dpg.mvStyleVar_WindowPadding, 10, 10, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 8, 4, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 13, 4, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_GrabMinSize, 9, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 13, category=cat)
-                # Borders
-                dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_WindowBorderSize, 1, category=cat)
-                # Alignment
-                dpg.add_theme_style(dpg.mvStyleVar_WindowTitleAlign, 0.5, 0.5, category=cat)
-                dpg.add_theme_style(dpg.mvStyleVar_SelectableTextAlign, 0.0, 0.5, category=cat)
-                # Colors
-                dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (13, 19, 33), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (29, 45, 68), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (240, 235, 216), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_FrameBg, (62, 92, 118), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (13, 19, 33), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (116, 140, 171, 255), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (29, 45, 68, 255), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBgCollapsed, (0, 0, 0, 125), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (0, 0, 0), category=cat)
-                dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (10, 67, 47, 103), category=cat)
+
         dpg.add_viewport_menu_bar(tag='Menu_bar')
         dpg.add_menu(parent="Menu_bar", label='Файл', tag='Files')
         dpg.add_menu_item(label='Собрать моды', parent='Files', callback=self.vpk_create)
@@ -147,6 +168,7 @@ class Interface(object):
                           callback=self.view_menu_bar_button)
         dpg.add_checkbox(label='Закрепить размер окон', parent='View', tag='Resizable_menu_bar_button',
                          callback=self.view_menu_bar_button)
+        default_font, bold_font, global_theme = self.styles()
         with dpg.window(label="Герои", width=int(0.4*self.width), height=300, no_close=False,
                         no_resize=False, pos=[0, 30], tag='Heroes'):
             heroes_filter = dpg.add_input_text(label='поиск', callback=self.heroes_search)
